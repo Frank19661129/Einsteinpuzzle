@@ -9,12 +9,33 @@ interface PuzzleBoardProps {
 export function PuzzleBoard({ config, pieces: initialPieces }: PuzzleBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [pieces, setPieces] = useState(() => {
-    // Start pieces randomly scattered on the board
-    return initialPieces.map((piece) => ({
-      ...piece,
-      currentX: Math.random() * (config.canvasSize - 100) + 50,
-      currentY: Math.random() * (config.canvasSize - 100) + 50,
-    }));
+    // For now: put just 1 piece in the tray, rest are correctly placed
+    const trayX = config.canvasSize + 50;
+    const trayY = 100;
+
+    return initialPieces.map((piece, index) => {
+      // Remove 5 pieces from the middle area (indices 15-19)
+      // These are more likely to be on the interesting part of the circle
+      const missingPieceIndices = [15, 16, 17, 18, 19];
+
+      if (missingPieceIndices.includes(index)) {
+        // Place in tray, stacked vertically
+        const trayPosition = missingPieceIndices.indexOf(index);
+        return {
+          ...piece,
+          currentX: trayX + (trayPosition % 2) * 80,
+          currentY: trayY + Math.floor(trayPosition / 2) * 80,
+          isPlaced: false,
+        };
+      } else {
+        return {
+          ...piece,
+          currentX: piece.correctX,
+          currentY: piece.correctY,
+          isPlaced: true,
+        };
+      }
+    });
   });
   const [draggedPiece, setDraggedPiece] = useState<string | null>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -202,7 +223,27 @@ export function PuzzleBoard({ config, pieces: initialPieces }: PuzzleBoardProps)
             pointerEvents: 'all'
           }}
         >
-          {/* Always show puzzle pieces */}
+          {/* Show the FULL background image */}
+          <image
+            href={config.imageUrl}
+            width={config.canvasSize}
+            height={config.canvasSize}
+            x={0}
+            y={0}
+          />
+
+          {/* Show WHITE gaps where pieces are missing */}
+          {pieces.filter(p => !p.isPlaced).map(piece => (
+            <polygon
+              key={`gap-${piece.id}`}
+              points={piece.polygon.points.map(p => `${p.x},${p.y}`).join(' ')}
+              fill="white"
+              stroke="#cbd5e1"
+              strokeWidth={2}
+            />
+          ))}
+
+          {/* Show draggable pieces (only the ones NOT in correct position) */}
           <defs>
             {pieces.map(piece => (
               <clipPath key={`clip-${piece.id}`} id={`clip-${piece.id}`}>
@@ -211,7 +252,7 @@ export function PuzzleBoard({ config, pieces: initialPieces }: PuzzleBoardProps)
             ))}
           </defs>
 
-          {pieces.map(piece => (
+          {pieces.filter(p => !p.isPlaced).map(piece => (
             <g
               key={piece.id}
               transform={`translate(${piece.currentX - piece.correctX}, ${piece.currentY - piece.correctY})`}
@@ -226,17 +267,14 @@ export function PuzzleBoard({ config, pieces: initialPieces }: PuzzleBoardProps)
                 style={{ cursor: isSolved ? 'default' : 'move' }}
                 onMouseDown={(e) => !isSolved && handleMouseDown(e as unknown as React.MouseEvent, piece.id)}
               />
-              {/* Show borders when not solved */}
-              {!isSolved && (
-                <polygon
-                  points={piece.polygon.points.map(p => `${p.x},${p.y}`).join(' ')}
-                  fill="none"
-                  stroke={piece.isPlaced ? '#10b981' : '#667eea'}
-                  strokeWidth={piece.isPlaced ? 3 : 2}
-                  opacity={0.5}
-                  pointerEvents="none"
-                />
-              )}
+              <polygon
+                points={piece.polygon.points.map(p => `${p.x},${p.y}`).join(' ')}
+                fill="none"
+                stroke="#667eea"
+                strokeWidth={2}
+                opacity={0.5}
+                pointerEvents="none"
+              />
             </g>
           ))}
         </svg>

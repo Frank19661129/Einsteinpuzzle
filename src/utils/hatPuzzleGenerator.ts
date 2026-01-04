@@ -8,8 +8,8 @@ export function createPuzzlePiecesFromPolygons(polygons: Polygon[]): PuzzlePiece
       polygon,
       correctX: centroid.x,
       correctY: centroid.y,
-      currentX: Math.random() * 400 + 100,
-      currentY: Math.random() * 400 + 100,
+      currentX: 0, // Will be set by PuzzleBoard to tray position
+      currentY: 0,
       rotation: 0,
       isPlaced: false,
     };

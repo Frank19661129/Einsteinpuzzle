@@ -1,6 +1,6 @@
 import { chromium } from 'playwright';
 
-const url = 'http://localhost:5175/';
+const url = 'http://localhost:5176/';
 
 (async () => {
   console.log('🧩 Testing Einstein Puzzle...\n');

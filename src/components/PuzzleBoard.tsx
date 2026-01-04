@@ -142,69 +142,36 @@ export function PuzzleBoard({ config, pieces: initialPieces }: PuzzleBoardProps)
           position: 'relative',
           width: totalWidth,
           height: config.canvasSize,
-          display: 'flex',
-          gap: '20px'
         }}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
-        {/* Puzzle Board */}
-        <svg
-          width={config.canvasSize}
-          height={config.canvasSize}
-          style={{
-            border: '2px solid #667eea',
-            borderRadius: '8px',
-            background: '#f8f9fa',
-            flexShrink: 0
-          }}
-        >
-          <defs>
-            {pieces.map(piece => (
-              <clipPath key={`clip-${piece.id}`} id={`clip-${piece.id}`}>
-                <polygon points={piece.polygon.points.map(p => `${p.x},${p.y}`).join(' ')} />
-              </clipPath>
-            ))}
-          </defs>
-
-          {pieces.map(piece => (
-            <g key={piece.id}>
-              <image
-                href={config.imageUrl}
-                width={config.canvasSize}
-                height={config.canvasSize}
-                x={piece.currentX - piece.correctX}
-                y={piece.currentY - piece.correctY}
-                clipPath={`url(#clip-${piece.id})`}
-                style={{ cursor: 'move' }}
-                onMouseDown={(e) => handleMouseDown(e as unknown as React.MouseEvent, piece.id)}
-              />
-              {/* Only show borders if not solved */}
-              {!isSolved && (
-                <polygon
-                  points={piece.polygon.points
-                    .map(p => `${p.x - piece.correctX + piece.currentX},${p.y - piece.correctY + piece.currentY}`)
-                    .join(' ')}
-                  fill="none"
-                  stroke={piece.isPlaced ? '#10b981' : '#667eea'}
-                  strokeWidth={piece.isPlaced ? 3 : 2}
-                  opacity={0.5}
-                  pointerEvents="none"
-                />
-              )}
-            </g>
-          ))}
-        </svg>
-
-        {/* Tray on the right */}
+        {/* Board background */}
         <div style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: config.canvasSize,
+          height: config.canvasSize,
+          border: '2px solid #667eea',
+          borderRadius: '8px',
+          background: '#f8f9fa',
+          pointerEvents: 'none'
+        }} />
+
+        {/* Tray background */}
+        <div style={{
+          position: 'absolute',
+          left: config.canvasSize + 20,
+          top: 0,
           width: '260px',
+          height: config.canvasSize,
           background: 'linear-gradient(135deg, #f8f9fa 0%, #e2e8f0 100%)',
           borderRadius: '8px',
           border: '2px solid #cbd5e1',
           padding: '16px',
-          position: 'relative'
+          pointerEvents: 'none'
         }}>
           <h3 style={{
             color: '#64748b',
@@ -224,6 +191,68 @@ export function PuzzleBoard({ config, pieces: initialPieces }: PuzzleBoardProps)
             {pieces.filter(p => !p.isPlaced).length} pieces remaining
           </p>
         </div>
+
+        {/* Full area SVG for all pieces */}
+        <svg
+          width={totalWidth}
+          height={config.canvasSize}
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            pointerEvents: 'all'
+          }}
+        >
+          {/* Show complete image when solved */}
+          {isSolved && (
+            <image
+              href={config.imageUrl}
+              width={config.canvasSize}
+              height={config.canvasSize}
+              x={0}
+              y={0}
+            />
+          )}
+
+          {/* Show puzzle pieces when not solved */}
+          {!isSolved && (
+            <>
+              <defs>
+                {pieces.map(piece => (
+                  <clipPath key={`clip-${piece.id}`} id={`clip-${piece.id}`}>
+                    <polygon points={piece.polygon.points.map(p => `${p.x},${p.y}`).join(' ')} />
+                  </clipPath>
+                ))}
+              </defs>
+
+              {pieces.map(piece => (
+                <g
+                  key={piece.id}
+                  transform={`translate(${piece.currentX - piece.correctX}, ${piece.currentY - piece.correctY})`}
+                >
+                  <image
+                    href={config.imageUrl}
+                    width={config.canvasSize}
+                    height={config.canvasSize}
+                    x={0}
+                    y={0}
+                    clipPath={`url(#clip-${piece.id})`}
+                    style={{ cursor: 'move' }}
+                    onMouseDown={(e) => handleMouseDown(e as unknown as React.MouseEvent, piece.id)}
+                  />
+                  <polygon
+                    points={piece.polygon.points.map(p => `${p.x},${p.y}`).join(' ')}
+                    fill="none"
+                    stroke={piece.isPlaced ? '#10b981' : '#667eea'}
+                    strokeWidth={piece.isPlaced ? 3 : 2}
+                    opacity={0.5}
+                    pointerEvents="none"
+                  />
+                </g>
+              ))}
+            </>
+          )}
+        </svg>
       </div>
 
       {/* Controls below */}

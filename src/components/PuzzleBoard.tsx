@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { PuzzlePiece, PuzzleConfig } from '../types';
 
 interface PuzzleBoardProps {
@@ -7,7 +7,16 @@ interface PuzzleBoardProps {
 }
 
 export function PuzzleBoard({ config, pieces: initialPieces }: PuzzleBoardProps) {
-  const [pieces, setPieces] = useState(initialPieces);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [pieces, setPieces] = useState(() => {
+    // Start pieces in tray on the right
+    const trayX = config.canvasSize + 50;
+    return initialPieces.map((piece, index) => ({
+      ...piece,
+      currentX: trayX + (index % 3) * 80,
+      currentY: 20 + Math.floor(index / 3) * 80,
+    }));
+  });
   const [draggedPiece, setDraggedPiece] = useState<string | null>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isSolved, setIsSolved] = useState(false);
@@ -112,27 +121,44 @@ export function PuzzleBoard({ config, pieces: initialPieces }: PuzzleBoardProps)
       if (progress < 1) {
         requestAnimationFrame(animate);
       } else {
+        // Wait for pieces to settle, then mark as solved
         setTimeout(() => {
           setIsSolved(true);
-        }, 400);
+        }, 500);
       }
     };
 
     animate();
   };
 
+  const totalWidth = config.canvasSize + 300; // Board + tray width
+
   return (
-    <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ position: 'relative', width: totalWidth, margin: '0 auto' }}>
+      {/* Main container with board and tray */}
       <div
-        style={{ position: 'relative', width: config.canvasSize, height: config.canvasSize, margin: '0 auto' }}
+        ref={containerRef}
+        style={{
+          position: 'relative',
+          width: totalWidth,
+          height: config.canvasSize,
+          display: 'flex',
+          gap: '20px'
+        }}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
       >
+        {/* Puzzle Board */}
         <svg
           width={config.canvasSize}
           height={config.canvasSize}
-          style={{ border: '2px solid #667eea', borderRadius: '8px', background: '#f8f9fa' }}
+          style={{
+            border: '2px solid #667eea',
+            borderRadius: '8px',
+            background: '#f8f9fa',
+            flexShrink: 0
+          }}
         >
           <defs>
             {pieces.map(piece => (
@@ -154,21 +180,53 @@ export function PuzzleBoard({ config, pieces: initialPieces }: PuzzleBoardProps)
                 style={{ cursor: 'move' }}
                 onMouseDown={(e) => handleMouseDown(e as unknown as React.MouseEvent, piece.id)}
               />
-              <polygon
-                points={piece.polygon.points
-                  .map(p => `${p.x - piece.correctX + piece.currentX},${p.y - piece.correctY + piece.currentY}`)
-                  .join(' ')}
-                fill="none"
-                stroke={piece.isPlaced ? '#10b981' : '#667eea'}
-                strokeWidth={piece.isPlaced ? 3 : 2}
-                opacity={0.5}
-                pointerEvents="none"
-              />
+              {/* Only show borders if not solved */}
+              {!isSolved && (
+                <polygon
+                  points={piece.polygon.points
+                    .map(p => `${p.x - piece.correctX + piece.currentX},${p.y - piece.correctY + piece.currentY}`)
+                    .join(' ')}
+                  fill="none"
+                  stroke={piece.isPlaced ? '#10b981' : '#667eea'}
+                  strokeWidth={piece.isPlaced ? 3 : 2}
+                  opacity={0.5}
+                  pointerEvents="none"
+                />
+              )}
             </g>
           ))}
         </svg>
+
+        {/* Tray on the right */}
+        <div style={{
+          width: '260px',
+          background: 'linear-gradient(135deg, #f8f9fa 0%, #e2e8f0 100%)',
+          borderRadius: '8px',
+          border: '2px solid #cbd5e1',
+          padding: '16px',
+          position: 'relative'
+        }}>
+          <h3 style={{
+            color: '#64748b',
+            fontSize: '14px',
+            fontWeight: '600',
+            marginBottom: '12px',
+            textAlign: 'center'
+          }}>
+            Puzzle Pieces
+          </h3>
+          <p style={{
+            color: '#94a3b8',
+            fontSize: '12px',
+            textAlign: 'center',
+            marginBottom: '8px'
+          }}>
+            {pieces.filter(p => !p.isPlaced).length} pieces remaining
+          </p>
+        </div>
       </div>
 
+      {/* Controls below */}
       <div style={{ marginTop: '20px', textAlign: 'center' }}>
         <button
           onClick={handleCheat}
@@ -189,7 +247,12 @@ export function PuzzleBoard({ config, pieces: initialPieces }: PuzzleBoardProps)
         </button>
 
         {isSolved && (
-          <p style={{ marginTop: '16px', fontSize: '18px', fontWeight: 'bold', color: '#10b981' }}>
+          <p style={{
+            marginTop: '16px',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            color: '#10b981'
+          }}>
             🎉 Puzzle completed! Oom Arie's circle graph revealed.
           </p>
         )}

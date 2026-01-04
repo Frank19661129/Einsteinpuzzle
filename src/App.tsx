@@ -9,6 +9,7 @@ import './App.css';
 function App() {
   const [gameState, setGameState] = useState<'start' | 'playing'>('start');
   const [tilingMode, setTilingMode] = useState<'hat' | 'grid'>('hat');
+  const [numPieces, setNumPieces] = useState<number>(5);
 
   const config: PuzzleConfig = {
     imageUrl: '/oom-arie-circle.png',
@@ -134,6 +135,28 @@ function App() {
                 </label>
               </div>
 
+              <div className="difficulty-selector" style={{ marginTop: '24px' }}>
+                <h3>Difficulty Level</h3>
+                <label style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Number of missing pieces:</span>
+                    <strong style={{ fontSize: '18px', color: '#667eea' }}>{numPieces}</strong>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="20"
+                    value={numPieces}
+                    onChange={(e) => setNumPieces(Number(e.target.value))}
+                    style={{ width: '100%' }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#94a3b8' }}>
+                    <span>Easy (1)</span>
+                    <span>Hard (20)</span>
+                  </div>
+                </label>
+              </div>
+
               <button onClick={startGame} className="primary-button">
                 Start Puzzle
               </button>
@@ -146,7 +169,7 @@ function App() {
             <button onClick={resetGame} className="back-button">
               ← Back to Info
             </button>
-            <PuzzleBoard config={config} pieces={pieces} />
+            <PuzzleBoard config={config} pieces={pieces} numMissingPieces={numPieces} />
           </div>
         )}
       </div>

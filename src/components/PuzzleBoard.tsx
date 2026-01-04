@@ -4,27 +4,31 @@ import type { PuzzlePiece, PuzzleConfig } from '../types';
 interface PuzzleBoardProps {
   config: PuzzleConfig;
   pieces: PuzzlePiece[];
+  numMissingPieces: number;
 }
 
-export function PuzzleBoard({ config, pieces: initialPieces }: PuzzleBoardProps) {
+export function PuzzleBoard({ config, pieces: initialPieces, numMissingPieces }: PuzzleBoardProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [pieces, setPieces] = useState(() => {
-    // For now: put just 1 piece in the tray, rest are correctly placed
     const trayX = config.canvasSize + 50;
-    const trayY = 100;
+    const trayY = 50;
+
+    // Select pieces from the middle area (more likely to be on the circle)
+    // Start from index 10 and take numMissingPieces consecutive pieces
+    const startIndex = Math.max(0, Math.min(10, initialPieces.length - numMissingPieces));
+    const missingPieceIndices = Array.from(
+      { length: numMissingPieces },
+      (_, i) => startIndex + i
+    );
 
     return initialPieces.map((piece, index) => {
-      // Remove 5 pieces from the middle area (indices 15-19)
-      // These are more likely to be on the interesting part of the circle
-      const missingPieceIndices = [15, 16, 17, 18, 19];
-
       if (missingPieceIndices.includes(index)) {
-        // Place in tray, stacked vertically
+        // Place in tray, in a grid layout (3 columns)
         const trayPosition = missingPieceIndices.indexOf(index);
         return {
           ...piece,
-          currentX: trayX + (trayPosition % 2) * 80,
-          currentY: trayY + Math.floor(trayPosition / 2) * 80,
+          currentX: trayX + (trayPosition % 3) * 70,
+          currentY: trayY + Math.floor(trayPosition / 3) * 70,
           isPlaced: false,
         };
       } else {

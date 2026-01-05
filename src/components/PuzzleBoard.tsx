@@ -44,6 +44,7 @@ export function PuzzleBoard({ config, pieces: initialPieces, numMissingPieces }:
   const [draggedPiece, setDraggedPiece] = useState<string | null>(null);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [isSolved, setIsSolved] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const allPlaced = pieces.every(p => p.isPlaced);
@@ -70,6 +71,9 @@ export function PuzzleBoard({ config, pieces: initialPieces, numMissingPieces }:
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!draggedPiece) return;
+
+    // Track mouse position for tooltip
+    setMousePos({ x: e.clientX, y: e.clientY });
 
     setPieces(prev =>
       prev.map(piece =>
@@ -282,6 +286,62 @@ export function PuzzleBoard({ config, pieces: initialPieces, numMissingPieces }:
             </g>
           ))}
         </svg>
+
+        {/* Formula tooltip when dragging */}
+        {draggedPiece && (() => {
+          const piece = pieces.find(p => p.id === draggedPiece);
+          const meta = piece?.polygon.metadata;
+          if (!meta) return null;
+
+          const PHI = (1 + Math.sqrt(5)) / 2;
+          const INV_PHI = 1 / PHI;
+
+          return (
+            <div
+              style={{
+                position: 'fixed',
+                left: mousePos.x + 20,
+                top: mousePos.y + 20,
+                background: 'rgba(102, 126, 234, 0.95)',
+                color: 'white',
+                padding: '12px 16px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontFamily: 'monospace',
+                pointerEvents: 'none',
+                zIndex: 1000,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                maxWidth: '320px',
+              }}
+            >
+              <div style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '14px' }}>
+                🧮 Hat Tiling Formula
+              </div>
+              <div style={{ lineHeight: '1.6' }}>
+                <div><strong>Position:</strong> Row {meta.row}, Col {meta.col}</div>
+                <div><strong>Variant:</strong> {meta.variant} (affects angle offset)</div>
+                <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.3)' }}>
+                  <strong>Golden Ratio Offset:</strong>
+                </div>
+                <div style={{ fontSize: '11px', opacity: 0.9, marginTop: '2px' }}>
+                  φ = {PHI.toFixed(5)} (golden ratio)
+                </div>
+                <div style={{ fontSize: '11px', opacity: 0.9 }}>
+                  1/φ = {INV_PHI.toFixed(5)}
+                </div>
+                <div style={{ fontSize: '11px', opacity: 0.9, marginTop: '2px' }}>
+                  offset = ({meta.row} × φ + {meta.col} × 1/φ) mod 1
+                </div>
+                <div style={{ fontSize: '11px', opacity: 0.9 }}>
+                  = {meta.fibOffset.toFixed(3)}
+                </div>
+                <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.3)' }}>
+                  <strong>Center:</strong> ({meta.centerX.toFixed(1)}, {meta.centerY.toFixed(1)})
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Controls below */}

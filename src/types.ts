@@ -5,6 +5,15 @@ export interface Point {
 
 export interface Polygon {
   points: Point[];
+  // Formula metadata for hat tiling
+  metadata?: {
+    row: number;
+    col: number;
+    variant: number;
+    fibOffset: number;
+    centerX: number;
+    centerY: number;
+  };
 }
 
 export interface PuzzlePiece {
@@ -16,6 +25,15 @@ export interface PuzzlePiece {
   currentY: number;
   rotation: number;
   isPlaced: boolean;
+  // Formula metadata for educational tooltip
+  formula?: {
+    row: number;
+    col: number;
+    variant: number;
+    fibOffset: number;
+    centerX: number;
+    centerY: number;
+  };
 }
 
 export interface PuzzleConfig {

@@ -34,6 +34,17 @@ export function generateHatTiling(canvasSize: number, complexity: number = 8): P
       const centerY = row * approxTileSize + approxTileSize / 2 + fibOffset * 0.7;
       const variant = (row + col) % 3;
       const polygon = createHatLikePolygon(centerX, centerY, approxTileSize * 0.45, variant);
+
+      // Add formula metadata for educational tooltip
+      polygon.metadata = {
+        row,
+        col,
+        variant,
+        fibOffset,
+        centerX,
+        centerY,
+      };
+
       polygons.push(polygon);
     }
   }

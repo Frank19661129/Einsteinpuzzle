@@ -12,7 +12,7 @@ function App() {
   const [numPieces, setNumPieces] = useState<number>(5);
 
   const config: PuzzleConfig = {
-    imageUrl: '/oom-arie-circle.png',
+    imageUrl: './oom-arie-circle.png',
     canvasSize: 600,
     gridRows: 4,
     gridCols: 4,
@@ -68,7 +68,7 @@ function App() {
             <div className="card">
               <div className="image-preview">
                 <img
-                  src="/oom-arie-circle.png"
+                  src="./oom-arie-circle.png"
                   alt="Oom Arie's Circle Graph"
                   style={{ maxWidth: '300px', borderRadius: '8px', marginBottom: '24px' }}
                 />

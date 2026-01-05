@@ -12,13 +12,67 @@ body {
 
 .app {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5199ae 0%, #405b5e 100%);
   padding: 20px;
 }
 
-.container {
-  max-width: 1000px;
+.layout-wrapper {
+  display: flex;
+  max-width: 1400px;
   margin: 0 auto;
+  gap: 30px;
+}
+
+.poem-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.poem-content {
+  background: white;
+  border-radius: 12px;
+  padding: 32px 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border-left: 4px solid #5199ae;
+}
+
+.poem-title {
+  color: #5199ae;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.poem {
+  color: #405b5e;
+  font-style: italic;
+  line-height: 1.8;
+  margin: 0 0 24px 0;
+  padding: 0;
+  border: none;
+  font-size: 0.95rem;
+}
+
+.poem-attribution {
+  color: #5199ae;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  padding-top: 16px;
+  border-top: 1px solid #9ECFCA;
+}
+
+.poem-attribution em {
+  color: #405b5e;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.container {
+  flex: 1;
+  max-width: 1000px;
 }
 
 .header {
@@ -48,7 +102,7 @@ body {
 }
 
 .card h2 {
-  color: #667eea;
+  color: #5199ae;
   margin-bottom: 24px;
   font-size: 2rem;
   text-align: center;
@@ -66,13 +120,13 @@ body {
 .info-block {
   margin-bottom: 32px;
   padding: 24px;
-  background: #f8f9fa;
+  background: #f8fafa;
   border-radius: 12px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #5199ae;
 }
 
 .info-block h3 {
-  color: #667eea;
+  color: #5199ae;
   margin-bottom: 16px;
   font-size: 1.4rem;
 }
@@ -95,7 +149,7 @@ body {
 }
 
 .info-block a {
-  color: #667eea;
+  color: #5199ae;
   text-decoration: none;
   font-weight: 600;
 }
@@ -145,7 +199,7 @@ body {
 }
 
 .primary-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #5199ae 0%, #3D8165 100%);
   color: white;
   border: none;
   padding: 16px 32px;
@@ -154,14 +208,14 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(81, 153, 174, 0.4);
   width: 100%;
   margin-top: 16px;
 }
 
 .primary-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  box-shadow: 0 6px 20px rgba(81, 153, 174, 0.6);
 }
 
 .primary-button:active {
@@ -192,6 +246,19 @@ body {
 }
 
 @media (max-width: 768px) {
+  .layout-wrapper {
+    flex-direction: column;
+  }
+
+  .poem-sidebar {
+    width: 100%;
+    order: 1;
+  }
+
+  .container {
+    order: 2;
+  }
+
   .header h1 {
     font-size: 2rem;
   }
@@ -206,5 +273,9 @@ body {
 
   .info-block {
     padding: 16px;
+  }
+
+  .poem-content {
+    padding: 24px 20px;
   }
 }

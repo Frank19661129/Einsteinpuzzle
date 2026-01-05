@@ -35,11 +35,33 @@ function App() {
 
   return (
     <div className="app">
-      <div className="container">
-        <header className="header">
-          <h1>🧩 Einstein Puzzle</h1>
-          <p className="subtitle">Oom Arie's Aperiodic Jigsaw</p>
-        </header>
+      <div className="layout-wrapper">
+        <aside className="poem-sidebar">
+          <div className="poem-content">
+            <h3 className="poem-title">Grenswaarden</h3>
+            <blockquote className="poem">
+              We trekken lijnen in cirkels,<br />
+              koorden tussen punten die we tellen,<br />
+              zoeken naar patronen<br />
+              in wat geen patroon belooft.
+              <br /><br />
+              Het beste wat we kunnen<br />
+              is niet het grootste bereiken,<br />
+              maar het ergste voorkomen<br />
+              met taal voor wat ertoe doet.
+            </blockquote>
+            <p className="poem-attribution">
+              <em>"Het beste wat we als mens kunnen doen is proberen het ergste te voorkomen."</em>
+              <br />
+              – W.L. Brugsma
+            </p>
+          </div>
+        </aside>
+        <div className="container">
+          <header className="header">
+            <h1>🧩 Einstein Puzzle</h1>
+            <p className="subtitle">Oom Arie's Aperiodic Jigsaw</p>
+          </header>
 
         {gameState === 'start' && (
           <div className="start-screen">
@@ -172,6 +194,7 @@ function App() {
             <PuzzleBoard config={config} pieces={pieces} numMissingPieces={numPieces} />
           </div>
         )}
+        </div>
       </div>
     </div>
   );

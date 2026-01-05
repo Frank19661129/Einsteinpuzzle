@@ -65,6 +65,7 @@ function App() {
 
         {gameState === 'start' && (
           <div className="start-screen">
+            <a href="../../" className="back-to-franklab">← Terug naar Franklab</a>
             <div className="card">
               <div className="image-preview">
                 <img
